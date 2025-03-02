@@ -4,7 +4,8 @@
 import os
 import torch
 import torch.nn as nn
-import ruamel.yaml as yaml
+# import ruamel.yaml as yaml
+from ruamel.yaml import YAML, Loader
 from torch.utils.tensorboard import SummaryWriter
 
 def over_write_args_from_dict(args, dict):
@@ -22,7 +23,8 @@ def over_write_args_from_file(args, yml):
     if yml == '':
         return
     with open(yml, 'r', encoding='utf-8') as f:
-        dic = yaml.load(f.read(), Loader=yaml.Loader)
+        yaml = YAML(typ='rt')
+        dic = yaml.load(f.read())
         for k in dic:
             setattr(args, k, dic[k])
 
@@ -60,7 +62,7 @@ def send_model_cuda(args, model, clip_batch=True):
             # if arg.gpu is None, DDP will divide and allocate batch_size
             # to all available GPUs if device_ids are not set.
             model.cuda()
-            model = torch.nn.parallel.DistributedDataParallel(model,  broadcast_buffers=False, 
+            model = torch.nn.parallel.DistributedDataParallel(model,  broadcast_buffers=False,
                                                                       find_unused_parameters=True)
     elif args.gpu is not None:
         torch.cuda.set_device(args.gpu)
@@ -86,7 +88,7 @@ class TBLog:
         self.use_tensorboard = use_tensorboard
         if self.use_tensorboard:
             self.writer = SummaryWriter(os.path.join(self.tb_dir, file_name))
-            
+
 
     def update(self, log_dict, it, suffix=None, mode="train"):
         """
@@ -153,7 +155,7 @@ class EMA:
         for name, param in self.model.named_parameters():
             new_average = (1.0 - self.decay) * param.data + self.decay * self.shadow[name]
             self.shadow[name] = new_average.clone()
-        
+
         for name, buffer in self.model.named_buffers():
             self.shadow[name] = buffer.clone()
 

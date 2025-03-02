@@ -9,8 +9,8 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.utils.checkpoint
 
-from timm.models.layers import DropPath, trunc_normal_
-from timm.models.layers.helpers import to_2tuple
+from timm.layers import DropPath, trunc_normal_
+from timm.layers.helpers import to_2tuple
 
 from semilearn.nets.utils import load_checkpoint
 
@@ -213,10 +213,10 @@ class VisionTransformer(nn.Module):
             only_fc: only use classifier, input should be features before classifier
             only_feat: only return pooled features
         """
-        
+
         if only_fc:
             return self.head(x)
-        
+
         x = self.extract(x)
         if self.global_pool:
             x = x[:, 1:].mean(dim=1) if self.global_pool == 'avg' else x[:, 0]
@@ -231,7 +231,7 @@ class VisionTransformer(nn.Module):
 
     def no_weight_decay(self):
         return {'pos_embed', 'cls_token'}
-    
+
     def group_matcher(self, coarse=False, prefix=''):
         return dict(
             stem=r'^{}cls_token|{}pos_embed|{}patch_embed'.format(prefix, prefix, prefix),  # stem and embed
@@ -265,7 +265,7 @@ def vit_small_patch16_224(pretrained=False, pretrained_path=None, **kwargs):
     model_kwargs = dict(patch_size=16, embed_dim=384, depth=12, num_heads=6, drop_path_rate=0.2, **kwargs)
     model = VisionTransformer(**model_kwargs)
     if pretrained:
-        model = load_checkpoint(model, pretrained_path)    
+        model = load_checkpoint(model, pretrained_path)
     return model
 
 
@@ -276,7 +276,7 @@ def vit_base_patch16_96(pretrained=False, pretrained_path=None, **kwargs):
     model_kwargs = dict(img_size=96, patch_size=16, embed_dim=768, depth=12, num_heads=12, drop_path_rate=0.2, **kwargs)
     model = VisionTransformer(**model_kwargs)
     if pretrained:
-        model = load_checkpoint(model, pretrained_path)   
+        model = load_checkpoint(model, pretrained_path)
     return model
 
 
@@ -287,5 +287,5 @@ def vit_base_patch16_224(pretrained=False, pretrained_path=None, **kwargs):
     model_kwargs = dict(patch_size=16, embed_dim=768, depth=12, num_heads=12, drop_path_rate=0.2, **kwargs)
     model = VisionTransformer(**model_kwargs)
     if pretrained:
-        model = load_checkpoint(model, pretrained_path)   
+        model = load_checkpoint(model, pretrained_path)
     return model
