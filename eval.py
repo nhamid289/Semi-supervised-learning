@@ -35,9 +35,9 @@ if __name__ == "__main__":
     parser.add_argument('--sample_rate', type=int, default=16000)
 
     args = parser.parse_args()
-    
+
     checkpoint_path = os.path.join(args.load_path)
-    checkpoint = torch.load(checkpoint_path)
+    checkpoint = torch.load(checkpoint_path, weights_only=False)
     load_model = checkpoint['ema_model']
     load_state_dict = {}
     for key, item in load_model.items():
@@ -49,14 +49,14 @@ if __name__ == "__main__":
     save_dir = '/'.join(checkpoint_path.split('/')[:-1])
     args.save_dir = save_dir
     args.save_name = ''
-    
+
     net = get_net_builder(args.net, args.net_from_name)(num_classes=args.num_classes)
     keys = net.load_state_dict(load_state_dict)
     if torch.cuda.is_available():
         net.cuda()
     net.eval()
-    
-    # specify these arguments manually 
+
+    # specify these arguments manually
     args.num_labels = 40
     args.ulb_num_labels = 49600
     args.lb_imb_ratio = 1
@@ -67,7 +67,7 @@ if __name__ == "__main__":
     dataset_dict = get_dataset(args, 'fixmatch', args.dataset, args.num_labels, args.num_classes, args.data_dir, False)
     eval_dset = dataset_dict['eval']
     eval_loader = DataLoader(eval_dset, batch_size=args.batch_size, drop_last=False, shuffle=False, num_workers=4)
- 
+
     acc = 0.0
     test_feats = []
     test_preds = []

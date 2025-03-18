@@ -4,7 +4,7 @@ import sys
 import os
 
 # Add the parent directory to the sys.path
-sys.path.append(os.path.abspath(os.path.join(os.getcwd(), '..')))
+# sys.path.append(os.path.abspath(os.path.join(os.getcwd(), '..')))
 import semilearn
 from semilearn import get_dataset, get_data_loader, get_net_builder, get_algorithm, get_config, Trainer
 
@@ -13,6 +13,10 @@ config = {
     'net': 'vit_tiny_patch2_32',
     'use_pretrain': True,
     'pretrain_path': 'https://github.com/microsoft/Semi-supervised-learning/releases/download/v.0.0.0/vit_tiny_patch2_32_mlp_im_1k_32.pth',
+    'save_dir': '../saved_models/usb_cv/',
+
+    'resume': False,
+    'load_path': './saved_models/usb_cv//fixmatch_cifar10_40_0/latest_model.pth',
 
     # optimization configs
     'epoch': 1,
@@ -32,7 +36,7 @@ config = {
     'num_classes': 10,
     'img_size': 32,
     'crop_ratio': 0.875,
-    'data_dir': './data',
+    'data_dir': '../data',
     'ulb_samples_per_class': None,
 
     # algorithm specific configs
@@ -46,8 +50,9 @@ config = {
     'distributed': False,
     "num_workers": 2,
 
-    'amp': True,
+    'amp': False,
 }
+
 config = get_config(config)
 
 
