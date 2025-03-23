@@ -10,7 +10,7 @@ from sklearn.metrics import accuracy_score, balanced_accuracy_score, precision_s
 
 import torch
 import torch.nn.functional as F
-from torch.cuda.amp import autocast, GradScaler
+from torch.amp import autocast, Gradscaler
 
 from semilearn.core.hooks import Hook, get_priority, CheckpointHook, TimerHook, LoggingHook, DistSamplerSeedHook, ParamUpdateHook, EvaluationHook, EMAHook, WANDBHook, AimHook
 from semilearn.core.utils import get_dataset, get_data_loader, get_optimizer, get_cosine_schedule_with_warmup, Bn_Controller
@@ -21,7 +21,7 @@ class AlgorithmBase:
     """
         Base class for algorithms
         init algorithm specific parameters and common parameters
-        
+
         Args:
             - args (`argparse`):
                 algorithm arguments
@@ -39,7 +39,7 @@ class AlgorithmBase:
         tb_log=None,
         logger=None,
         **kwargs):
-        
+
         # common arguments
         self.args = args
         self.num_classes = args.num_classes
@@ -49,7 +49,7 @@ class AlgorithmBase:
         self.num_eval_iter = args.num_eval_iter
         self.num_log_iter = args.num_log_iter
         self.num_iter_per_epoch = int(self.num_train_iter // self.epochs)
-        self.lambda_u = args.ulb_loss_ratio 
+        self.lambda_u = args.ulb_loss_ratio
         self.use_cat = args.use_cat
         self.use_amp = args.amp
         self.clip_grad = args.clip_grad
@@ -98,7 +98,7 @@ class AlgorithmBase:
         # self.init(**kwargs)
 
         # set common hooks during training
-        self._hooks = []  # record underlying hooks 
+        self._hooks = []  # record underlying hooks
         self.hooks_dict = OrderedDict() # actual object to be used to call hooks
         self.set_hooks()
 
@@ -107,7 +107,7 @@ class AlgorithmBase:
         algorithm specific init function, to add parameters into class
         """
         raise NotImplementedError
-    
+
 
     def set_dataset(self):
         """
@@ -132,7 +132,7 @@ class AlgorithmBase:
         """
         if self.dataset_dict is None:
             return
-            
+
         self.print_fn("Create train and test data loaders")
         loader_dict = {}
         loader_dict['train_lb'] = get_data_loader(self.args,
@@ -160,7 +160,7 @@ class AlgorithmBase:
                                               data_sampler=None,
                                               num_workers=self.args.num_workers,
                                               drop_last=False)
-        
+
         if self.dataset_dict['test'] is not None:
             loader_dict['test'] =  get_data_loader(self.args,
                                                    self.dataset_dict['test'],
@@ -229,10 +229,10 @@ class AlgorithmBase:
         for arg, var in kwargs.items():
             if not arg in input_args:
                 continue
-            
+
             if var is None:
                 continue
-            
+
             # send var to cuda
             if isinstance(var, dict):
                 var = {k: v.cuda(self.gpu) for k, v in var.items()}
@@ -240,7 +240,7 @@ class AlgorithmBase:
                 var = var.cuda(self.gpu)
             input_dict[arg] = var
         return input_dict
-    
+
 
     def process_out_dict(self, out_dict=None, **kwargs):
         """
@@ -251,7 +251,7 @@ class AlgorithmBase:
 
         for arg, var in kwargs.items():
             out_dict[arg] = var
-        
+
         # process res_dict, add output from res_dict to out_dict if necessary
         return out_dict
 
@@ -276,7 +276,7 @@ class AlgorithmBase:
         """
         # implement train step for each algorithm
         # compute loss
-        # update model 
+        # update model
         # record log_dict
         # return log_dict
         raise NotImplementedError
@@ -291,11 +291,11 @@ class AlgorithmBase:
 
         for epoch in range(self.start_epoch, self.epochs):
             self.epoch = epoch
-            
+
             # prevent the training iterations exceed args.num_train_iter
             if self.it >= self.num_train_iter:
                 break
-            
+
             self.call_hook("before_train_epoch")
 
             for data_lb, data_ulb in zip(self.loader_dict['train_lb'],
@@ -308,7 +308,7 @@ class AlgorithmBase:
                 self.out_dict, self.log_dict = self.train_step(**self.process_batch(**data_lb, **data_ulb))
                 self.call_hook("after_train_step")
                 self.it += 1
-            
+
             self.call_hook("after_train_epoch")
 
         self.call_hook("after_run")
@@ -332,7 +332,7 @@ class AlgorithmBase:
             for data in eval_loader:
                 x = data['x_lb']
                 y = data['y_lb']
-                
+
                 if isinstance(x, dict):
                     x = {k: v.cuda(self.gpu) for k, v in x.items()}
                 else:
@@ -343,7 +343,7 @@ class AlgorithmBase:
                 total_num += num_batch
 
                 logits = self.model(x)[out_key]
-                
+
                 loss = F.cross_entropy(logits, y, reduction='mean', ignore_index=-1)
                 y_true.extend(y.cpu().tolist())
                 y_pred.extend(torch.max(logits, dim=-1)[1].cpu().tolist())
@@ -365,7 +365,7 @@ class AlgorithmBase:
         self.ema.restore()
         self.model.train()
 
-        eval_dict = {eval_dest+'/loss': total_loss / total_num, eval_dest+'/top-1-acc': top1, eval_dest+'/top-5-acc': top5, 
+        eval_dict = {eval_dest+'/loss': total_loss / total_num, eval_dest+'/top-1-acc': top1, eval_dest+'/top-5-acc': top5,
                      eval_dest+'/balanced_acc': balanced_top1, eval_dest+'/precision': precision, eval_dest+'/recall': recall, eval_dest+'/F1': F1}
         if return_logits:
             eval_dict[eval_dest+'/logits'] = y_logits
@@ -390,7 +390,7 @@ class AlgorithmBase:
         if self.scheduler is not None:
             save_dict['scheduler'] = self.scheduler.state_dict()
         return save_dict
-    
+
 
     def save_model(self, save_name, save_path):
         """
@@ -464,7 +464,7 @@ class AlgorithmBase:
                 self._hooks.insert(i + 1, hook)
                 inserted = True
                 break
-        
+
         if not inserted:
             self._hooks.insert(0, hook)
 
@@ -472,7 +472,7 @@ class AlgorithmBase:
         self.hooks_dict = OrderedDict()
         for hook in self._hooks:
             self.hooks_dict[hook.name] = hook
-        
+
 
 
     def call_hook(self, fn_name, hook_name=None, *args, **kwargs):
@@ -483,10 +483,10 @@ class AlgorithmBase:
             hook_name (str): The specific hook name to be called, such as
                 "param_update" or "dist_align", uesed to call single hook in train_step.
         """
-        
+
         if hook_name is not None:
             return getattr(self.hooks_dict[hook_name], fn_name)(self, *args, **kwargs)
-        
+
         for hook in self.hooks_dict.values():
             if hasattr(hook, fn_name):
                 getattr(hook, fn_name)(self, *args, **kwargs)
@@ -510,23 +510,23 @@ class AlgorithmBase:
 class ImbAlgorithmBase(AlgorithmBase):
     def __init__(self, args, net_builder, tb_log=None, logger=None, **kwargs):
         super().__init__(args, net_builder, tb_log, logger, **kwargs)
-        
+
         # imbalanced arguments
         self.lb_imb_ratio = self.args.lb_imb_ratio
         self.ulb_imb_ratio = self.args.ulb_imb_ratio
         self.imb_algorithm = self.args.imb_algorithm
-    
+
     def imb_init(self, *args, **kwargs):
         """
         intiialize imbalanced algorithm parameters
         """
-        pass 
+        pass
 
     def set_optimizer(self):
         if 'vit' in self.args.net and self.args.dataset in ['cifar100', 'food101', 'semi_aves', 'semi_aves_out']:
-            return super().set_optimizer() 
+            return super().set_optimizer()
         elif self.args.dataset in ['imagenet', 'imagenet127']:
-            return super().set_optimizer() 
+            return super().set_optimizer()
         else:
             self.print_fn("Create optimizer and scheduler")
             optimizer = get_optimizer(self.model, self.args.optim, self.args.lr, self.args.momentum, self.args.weight_decay, self.args.layer_decay, bn_wd_skip=False)
