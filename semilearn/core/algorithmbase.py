@@ -10,7 +10,7 @@ from sklearn.metrics import accuracy_score, balanced_accuracy_score, precision_s
 
 import torch
 import torch.nn.functional as F
-from torch.amp import autocast, Gradscaler
+from torch.amp import autocast, grad_scaler
 
 from semilearn.core.hooks import Hook, get_priority, CheckpointHook, TimerHook, LoggingHook, DistSamplerSeedHook, ParamUpdateHook, EvaluationHook, EMAHook, WANDBHook, AimHook
 from semilearn.core.utils import get_dataset, get_data_loader, get_optimizer, get_cosine_schedule_with_warmup, Bn_Controller
@@ -62,7 +62,7 @@ class AlgorithmBase:
         self.tb_log = tb_log
         self.print_fn = print if logger is None else logger.info
         self.ngpus_per_node = torch.cuda.device_count()
-        self.loss_scaler = GradScaler()
+        self.loss_scaler = grad_scaler
         self.amp_cm = autocast if self.use_amp else contextlib.nullcontext
         self.gpu = args.gpu
         self.rank = args.rank
