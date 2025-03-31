@@ -69,6 +69,7 @@ class SSLFixMatch(SSLAlgorithm):
 
             total_loss = sup_loss + self.lambda_u * unsup_loss
 
+        return total_loss
         # out_dict = self.process_out_dict(loss=total_loss, feat=feat_dict)
         # log_dict = self.process_log_dict(sup_loss=sup_loss.item(),
         #                                  unsup_loss=unsup_loss.item(),

@@ -17,5 +17,4 @@ def get_algorithm(args, net_builder, tb_log, logger):
         raise KeyError(f'Unknown algorithm: {str(args.algorithm)}')
 
 
-
-from .fixmatch import SSLFixMatch
+from .ssl_algorithm import SSLAlgorithm
