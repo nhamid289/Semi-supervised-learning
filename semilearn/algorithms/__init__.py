@@ -18,4 +18,4 @@ def get_algorithm(args, net_builder, tb_log, logger):
 
 
 
-from fixmatch import SSLFixMatch
+from .fixmatch import SSLFixMatch
