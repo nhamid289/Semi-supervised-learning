@@ -7,6 +7,6 @@ from semilearn.datasets.nlp_datasets import get_json_dset
 from semilearn.datasets.audio_datasets import get_pkl_dset
 from semilearn.datasets.samplers import name2sampler, DistributedSampler, WeightedDistributedSampler, ImageNetDistributedSampler
 
-from .dataset import SSLDataset, split_lb_ulb_balanced, split_lb_ulb_imbalanced
+from .dataset import BaseDataset, SSLDataContainer, split_lb_ulb_balanced, split_lb_ulb_imbalanced
 
 

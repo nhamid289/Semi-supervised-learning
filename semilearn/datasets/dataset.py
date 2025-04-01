@@ -4,7 +4,7 @@ import numpy as np
 from torch.utils.data import Dataset
 
 
-def split_lb_ulb_balanced(X, y, num_classes, num_lbl, num_ulbl = None,
+def split_lb_ulb_balanced(X, y, num_lbl, num_ulbl = None,
                  lbl_idx=None, ulbl_idx=None, lbl_in_ulbl=True,
                  return_idx = False, seed=None):
     """
@@ -30,13 +30,6 @@ def split_lb_ulb_balanced(X, y, num_classes, num_lbl, num_ulbl = None,
             and unlabelled features and labels
     """
 
-    # if (num_lbl % num_classes) != 0:
-    #     raise Exception("The number of labelled entries must be divisible by "
-    #     "the number of classes")
-    # if (num_ulbl % num_classes) != 0:
-    #     raise Exception("The number of unlabelled entries must be divisible "
-    #     "by the number of classes")
-
     lbl_idx = [] if lbl_idx is None else lbl_idx
     ulbl_idx = [] if ulbl_idx is None else ulbl_idx
     if seed is not None:
@@ -60,7 +53,7 @@ def split_lb_ulb_balanced(X, y, num_classes, num_lbl, num_ulbl = None,
 def split_lb_ulb_imbalanced():
     pass
 
-class SSLDataset(Dataset):
+class BaseDataset(Dataset):
     """
     A class to store a dataset and apply any transformations required by
     an algorithm
@@ -121,5 +114,40 @@ class SSLDataset(Dataset):
         X_s = self.strong_transform(X) if self.strong_tranform is not None else None
 
         return X_w, y, X_m, X_s
+
+
+class SSLDatasetInterface:
+
+    def __init__(self, lbl_dataset=None, ulbl_dataset=None,
+                 lbl_loader=None, ulbl_loader=None,
+                 eval_dataset=None, eval_loader=None):
+
+        self.lbl_dataset = lbl_dataset
+        self.ulbl_dataset = ulbl_dataset
+        self.lbl_loader = lbl_loader
+        self.ulbl_loader = ulbl_loader
+        self.eval_dataset = eval_dataset
+        self.get_eval_loader = eval_loader
+
+    def get_lbl_dataset(self):
+        return self.lbl_dataset
+
+    def get_ulbl_dataset(self):
+        return self.ulbl_dataset
+
+    def get_lbl_loader(self):
+        return self.lbl_loader
+
+    def get_ulbl_loader(self):
+        return self.ulbl_loader
+
+    def get_eval_dataset(self):
+        return self.eval_dataset
+
+    def get_eval_loader(self):
+        return self.eval_loader
+
+
+
 
 
