@@ -37,7 +37,7 @@ ulb_samples_per_class: None
 
 # algorithm specific configs
 hard_label: True
-uratio': 2
+uratio: 2
 ulb_loss_ratio: 1.0
 
 # device configs
