@@ -1,6 +1,6 @@
 
 
-from semilearn.datasets import BaseDataset, SSLDataContainer, split_lb_ulb_balanced
+from semilearn.datasets import BaseDataset, SSLDatasetInterface, split_lb_ulb_balanced
 from semilearn.datasets.augmentation import RandAugment
 
 from torch.utils.data import DataLoader
@@ -8,7 +8,7 @@ from torch.utils.data import DataLoader
 from torchvision.datasets import CIFAR10
 from torchvision import transforms
 
-class Cifar10(SSLDataContainer):
+class Cifar10(SSLDatasetInterface):
 
     def __init__(self, config):
 

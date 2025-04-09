@@ -30,25 +30,30 @@ def split_lb_ulb_balanced(X, y, num_lbl, num_ulbl = None,
             and unlabelled features and labels
     """
 
-    lbl_idx = [] if lbl_idx is None else lbl_idx
-    ulbl_idx = [] if ulbl_idx is None else ulbl_idx
+    # lbls = [] if lbl_idx is None else lbl_idx
+    # ulbls = [] if ulbl_idx is None else ulbl_idx
+    X, y = np.array(X), np.array(y)
+    lbls = []
+    ulbls = []
     if seed is not None:
         np.random.seed(seed)
 
-    for label in np.unique(y):
-        idx = np.where(target = label)
+    for c in range(len(y)):
+        idx = np.where(y == c)[0]
+    # for label in np.unique(y):
+        # idx = np.where(y == label)[0]
         np.random.shuffle(idx)
         # take the first num_lbl from shuffled indices
-        lbl_idx.extend(idx[:num_lbl])
+        lbls.extend(idx[:num_lbl])
         if num_ulbl is None:
-            ulbl_idx.extend(idx[num_lbl:])
+            ulbls.extend(idx[num_lbl:])
         else:
-            ulbl_idx.extend(idx[num_lbl: num_lbl + num_ulbl])
+            ulbls.extend(idx[num_lbl: num_lbl + num_ulbl])
 
     if return_idx:
-        return lbl_idx, ulbl_idx
+        return lbls, ulbls
 
-    return X[lbl_idx], y[lbl_idx], X[ulbl_idx], y[ulbl_idx]
+    return X[lbls], y[lbls], X[ulbls], y[ulbls]
 
 def split_lb_ulb_imbalanced():
     pass
