@@ -1,4 +1,7 @@
 from torch.utils.data import Dataset
+from torchvision import transforms
+from PIL import Image
+import numpy as np
 
 class BaseDataset(Dataset):
 
@@ -57,9 +60,13 @@ class BaseDataset(Dataset):
         X = self.X[index]
         y = self.y[index] if self.y is not None else None
 
-        X_w = self.weak_transform(X) if self.weak_tranform is not None else X
-        X_m = self.medium_transform(X) if self.medium_tranform is not None else None
-        X_s = self.strong_transform(X) if self.strong_tranform is not None else None
+        if isinstance(X, np.ndarray):
+            X = Image.fromarray(X)
+        # y = transforms.ToTensor()(y)
+
+        X_w = self.weak_transform(X) if self.weak_transform is not None else X
+        X_m = self.medium_transform(X) if self.medium_transform is not None else None
+        X_s = self.strong_transform(X) if self.strong_transform is not None else None
 
         return X_w, y, X_m, X_s
 
