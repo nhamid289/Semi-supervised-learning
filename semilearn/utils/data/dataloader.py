@@ -1,5 +1,19 @@
 from torch.utils.data import DataLoader
 
+
+class SSLBatch():
+    def __init__(self, X_lbl_weak, X_lbl_medium, X_lbl_strong, y_lbl,
+                 X_ulbl_weak, X_ulbl_medium, X_ulbl_strong, y_ulbl):
+
+        self.X_lbl_weak = X_lbl_weak
+        self.X_lbl_medium = X_lbl_medium
+        self.X_lbl_strong = X_lbl_strong
+        self.y_lbl = y_lbl
+        self.X_ulbl_weak = X_ulbl_weak
+        self.X_ulbl_medium = X_ulbl_medium
+        self.X_ulbl_strong = X_ulbl_strong
+        self.y_ulbl = y_ulbl
+
 class SSLDataLoader(DataLoader):
 
     def __init__(self, lbl_dataset, ulbl_dataset,
@@ -23,7 +37,7 @@ class SSLDataLoader(DataLoader):
     def __next__(self):
         lbl_batch = next(self.lbl_iter)
         ulbl_batch = next(self.ulbl_iter)
-        return lbl_batch, ulbl_batch
+        return SSLBatch(*lbl_batch, *ulbl_batch)
 
     def __len__(self):
         return min(len(self.lbl_loader), len(self.ulbl_loader))

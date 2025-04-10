@@ -3,6 +3,14 @@ from torchvision import transforms
 from PIL import Image
 import numpy as np
 
+
+class Batch():
+    def __init__(self, X_weak, X_medium, X_strong, y):
+        self.X_weak = X_weak
+        self.X_medium = X_medium
+        self.X_strong = X_strong
+        self.y = y
+
 class BaseDataset(Dataset):
 
     """
@@ -68,7 +76,7 @@ class BaseDataset(Dataset):
         X_m = self.medium_transform(X) if self.medium_transform is not None else None
         X_s = self.strong_transform(X) if self.strong_transform is not None else None
 
-        return X_w, y, X_m, X_s
+        return X_w, X_m, X_s, y
 
 
 
