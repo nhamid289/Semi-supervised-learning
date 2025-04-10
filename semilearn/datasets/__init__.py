@@ -10,7 +10,7 @@ from semilearn.datasets.audio_datasets import get_pkl_dset
 from semilearn.datasets.samplers import name2sampler, DistributedSampler, WeightedDistributedSampler, ImageNetDistributedSampler
 
 
-
+from .dataset import SSLDataset
 
 
 
