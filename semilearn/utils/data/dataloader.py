@@ -1,6 +1,6 @@
 from torch.utils.data import DataLoader
 
-class SSLTrainLoader(DataLoader):
+class SSLDataLoader(DataLoader):
 
     def __init__(self, lbl_dataset, ulbl_dataset,
                  lbl_batch_size, ulbl_batch_size,
