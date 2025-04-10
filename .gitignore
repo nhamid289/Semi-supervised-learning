@@ -1,5 +1,5 @@
 data_statistics/
-data/
+# data/
 saved_models/
 pretrained_weights/
 ssl_nlp_datasets/
