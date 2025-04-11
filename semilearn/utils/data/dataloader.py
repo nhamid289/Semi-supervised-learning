@@ -2,13 +2,16 @@ from torch.utils.data import DataLoader
 
 
 class SSLBatch():
-    def __init__(self, X_lbl_weak, X_lbl_medium, X_lbl_strong, y_lbl,
-                 X_ulbl_weak, X_ulbl_medium, X_ulbl_strong, y_ulbl):
+    def __init__(self, X_lbl, X_lbl_weak, X_lbl_medium, X_lbl_strong, y_lbl,
+                 X_ulbl, X_ulbl_weak, X_ulbl_medium, X_ulbl_strong, y_ulbl):
 
+        self.X_lbl = X_lbl
         self.X_lbl_weak = X_lbl_weak
         self.X_lbl_medium = X_lbl_medium
         self.X_lbl_strong = X_lbl_strong
         self.y_lbl = y_lbl
+
+        self.X_ulbl = X_ulbl
         self.X_ulbl_weak = X_ulbl_weak
         self.X_ulbl_medium = X_ulbl_medium
         self.X_ulbl_strong = X_ulbl_strong
