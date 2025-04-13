@@ -50,5 +50,5 @@ class SSLDataLoader(DataLoader):
         return SSLBatch(*lbl_batch, *ulbl_batch)
 
     def __len__(self):
-        return len(self.ulbl_loader)
-        # return min(len(self.lbl_loader), len(self.ulbl_loader))
+        # return len(self.ulbl_loader)
+        return min(len(self.lbl_loader), len(self.ulbl_loader))
