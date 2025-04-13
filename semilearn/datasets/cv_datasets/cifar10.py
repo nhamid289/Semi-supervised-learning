@@ -5,6 +5,8 @@ from semilearn.datasets import SSLDataset
 from semilearn.utils.data import BaseDataset, split_lb_ulb_balanced
 from semilearn.datasets.augmentation import RandAugment
 
+import numpy as np
+
 class Cifar10(SSLDataset):
 
     def __init__(self, num_lbl=4, num_ulbl=None, seed=None,
@@ -71,6 +73,7 @@ class Cifar10(SSLDataset):
         cifar10_test = CIFAR10(data_dir, train=False, download=download)
 
         X, y = cifar10_test.data, cifar10_test.targets
+        X, y = np.array(X), np.array(y)
         self.eval_dataset = BaseDataset(X=X, y=y, num_classes=10,
                                         weak_transform=self.eval_transform)
 
