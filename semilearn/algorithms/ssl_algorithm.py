@@ -3,18 +3,17 @@ import numpy as np
 from inspect import signature
 
 from semilearn.algorithms.utils import smooth_targets
-
+from semilearn.utils.data import SSLBatch
 
 
 class SSLAlgorithm:
 
-    def __init__(self, config, **kwargs):
+    def __init__(self, **kwargs):
         pass
 
 
 
-    def train_step(self, model, idx_lb, x_lb, y_lb, idx_ulb, x_ulb_w, x_ulb_s,
-                   **kwargs):
+    def train_step(self, model, batch:SSLBatch, **kwargs):
         """
         train_step specific to each algorithm
         """
