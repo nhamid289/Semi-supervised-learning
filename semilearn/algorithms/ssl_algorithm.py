@@ -8,12 +8,12 @@ from semilearn.utils.data import SSLBatch
 
 class SSLAlgorithm:
 
-    def __init__(self, **kwargs):
+    def __init__(self):
         pass
 
 
 
-    def train_step(self, model, batch:SSLBatch, **kwargs):
+    def train_step(self, model, batch:SSLBatch):
         """
         train_step specific to each algorithm
         """
@@ -60,29 +60,3 @@ class SSLAlgorithm:
             pseudo_label = logits
 
         return pseudo_label
-
-    def process_batch(self, input_args=None, **kwargs):
-        """
-        process batch data, send data to cuda
-        NOTE **kwargs should have the same arguments to train_step function as keys to work properly
-        """
-        if input_args is None:
-            input_args = signature(self.train_step).parameters
-            input_args = list(input_args.keys())
-
-        input_dict = {}
-
-        for arg, var in kwargs.items():
-            if not arg in input_args:
-                continue
-
-            if var is None:
-                continue
-
-            # send var to cuda
-            if isinstance(var, dict):
-                var = {k: v.cuda(self.config.gpu) for k, v in var.items()}
-            else:
-                var = var.cuda(self.config.gpu)
-            input_dict[arg] = var
-        return input_dict

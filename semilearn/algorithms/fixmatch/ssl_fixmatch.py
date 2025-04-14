@@ -1,16 +1,14 @@
-
-
-
-
 import torch
 from semilearn.algorithms import SSLAlgorithm
+from semilearn.algorithms.utils import smooth_targets
 from semilearn.utils.data import SSLBatch
 from semilearn.core.criterions import CELoss, ConsistencyLoss
 
 class SSLFixMatch(SSLAlgorithm):
 
-    def __init__(self, use_hard_label=False, T=1.0, lambda_u = 1.0, conf_threshold=0.95,
-                 sup_loss_func = CELoss(), unsup_loss_func = ConsistencyLoss()):
+    def __init__(self, use_hard_label=False, T=1.0, lambda_u=1.0,
+                 conf_threshold=0.95, sup_loss_func = CELoss(),
+                 unsup_loss_func = ConsistencyLoss()):
         """
 
         """
@@ -36,13 +34,13 @@ class SSLFixMatch(SSLAlgorithm):
 
         sup_loss = self.sup_loss_func(out_lbl_weak['logits'], batch.y_lbl, reduction='mean')
 
-        probs_ulbl_w = self.compute_prob(out_ulbl_weak['logits'].detach())
+        probs_ulbl_w = self._compute_prob(out_ulbl_weak['logits'].detach())
 
         with torch.no_grad():
             max_probs, _ = torch.max(probs_ulbl_w, dim=-1)
             mask = max_probs.ge(self.conf_threshold).to(max_probs.dtype)
 
-        pseudo_label = self.gen_ulb_targets(logits=probs_ulbl_w,
+        pseudo_label = self._gen_ulb_targets(logits=probs_ulbl_w,
                                             use_hard_label=self.use_hard_label,
                                             T=self.T,
                                             softmax=False)
@@ -53,82 +51,52 @@ class SSLFixMatch(SSLAlgorithm):
 
         return total_loss
 
-        # def old():
-            # logits_x_lb = outs_x_lb['logits']
-            # feats_x_lb = outs_x_lb['feat']
-
-            # outs_x_ulb_s = model(x_ulb_s)
-
-            # logits_x_ulb_s = outs_x_ulb_s['logits']
-            # feats_x_ulb_s = outs_x_ulb_s['feat']
-
-
-
-
-            # # inference and calculate sup/unsup losses
-            # with config.amp_cm():
-            #     if config.use_cat:
-            #         inputs = torch.cat((x_lb, x_ulb_w, x_ulb_s))
-            #         outputs = model(inputs)
-            #         logits_x_lb = outputs['logits'][:num_lb]
-            #         logits_x_ulb_w, logits_x_ulb_s = outputs['logits'][num_lb:].chunk(2)
-            #         feats_x_lb = outputs['feat'][:num_lb]
-            #         feats_x_ulb_w, feats_x_ulb_s = outputs['feat'][num_lb:].chunk(2)
-            #     else:
-            #         outs_x_lb = model(x_lb)
-            #         logits_x_lb = outs_x_lb['logits']
-            #         feats_x_lb = outs_x_lb['feat']
-            #         outs_x_ulb_s = model(x_ulb_s)
-            #         logits_x_ulb_s = outs_x_ulb_s['logits']
-            #         feats_x_ulb_s = outs_x_ulb_s['feat']
-            #         with torch.no_grad():
-            #             outs_x_ulb_w = model(x_ulb_w)
-            #             logits_x_ulb_w = outs_x_ulb_w['logits']
-            #             feats_x_ulb_w = outs_x_ulb_w['feat']
-            # feat_dict = {'x_lb':feats_x_lb, 'x_ulb_w':feats_x_ulb_w, 'x_ulb_s':feats_x_ulb_s}
-
-
-
-            # probs_x_ulb_w = torch.softmax(logits_x_ulb_w, dim=-1)
-            # probs_x_ulb_w = self.compute_prob(logits_x_ulb_w.detach())
-
-            # compute mask
-            # mask = self.call_hook("masking", "MaskingHook", logits_x_ulb=probs_x_ulb_w, softmax_x_ulb=False)
-
-            # # generate unlabeled targets using pseudo label hook
-            # pseudo_label = self.call_hook("gen_ulb_targets", "PseudoLabelingHook",
-            #                               logits=probs_x_ulb_w,
-            #                               use_hard_label=self.use_hard_label,
-            #                               T=self.T,
-            #                               softmax=False)
-
-            # pseudo_label = self.gen_ulb_targets(logits=probs_x_ulb_w,
-            #                                     use_hard_label=self.config.use_hard_label,
-            #                                     T=self.config.T,
-            #                                     softmax=False)
-
-            # unsup_loss = self.consistency_loss(logits_x_ulb_s, pseudo_label, 'ce')
-
-            # total_loss = sup_loss + self.config.lambda_u * unsup_loss
-
-            # return total_loss
-            # out_dict = self.process_out_dict(loss=total_loss, feat=feat_dict)
-            # log_dict = self.process_log_dict(sup_loss=sup_loss.item(),
-            #                                  unsup_loss=unsup_loss.item(),
-            #                                  total_loss=total_loss.item(),
-            #                                  util_ratio=mask.float().mean().item())
-            # return out_dict, log_dict
-
-
 
     def _mask(self, logits_x_ulb, softmax_x_ulb=True, *args, **kwargs):
         with torch.no_grad():
             if softmax_x_ulb:
                 # probs_x_ulb = torch.softmax(logits_x_ulb.detach(), dim=-1)
-                probs_x_ulb = self.compute_prob(logits_x_ulb.detach())
+                probs_x_ulb = self._compute_prob(logits_x_ulb.detach())
             else:
                 # logits is already probs
                 probs_x_ulb = logits_x_ulb.detach()
             max_probs, _ = torch.max(probs_x_ulb, dim=-1)
             mask = max_probs.ge(self.p_cutoff).to(max_probs.dtype)
             return mask
+
+    def _compute_prob(self, logits):
+        return torch.softmax(logits, dim=-1)
+
+    @torch.no_grad()
+    def _gen_ulb_targets(self, logits, use_hard_label=True, T=1.0, softmax=True,
+                        label_smoothing=0.0):
+        """
+        generate pseudo-labels from logits/probs
+
+        Args:
+            algorithm: base algorithm
+            logits: logits (or probs, need to set softmax to False)
+            use_hard_label: flag of using hard labels instead of soft labels
+            T: temperature parameters
+            softmax: flag of using softmax on logits
+            label_smoothing: label_smoothing parameter
+        """
+
+        logits = logits.detach()
+        if use_hard_label:
+            # return hard label directly
+            pseudo_label = torch.argmax(logits, dim=-1)
+            if label_smoothing:
+                pseudo_label = smooth_targets(logits, pseudo_label,
+                                              label_smoothing)
+
+        # return soft label
+        elif softmax:
+            # pseudo_label = torch.softmax(logits / T, dim=-1)
+            pseudo_label = self._compute_prob(logits / T)
+
+        else:
+            # inputs logits converted to probabilities already
+            pseudo_label = logits
+
+        return pseudo_label
