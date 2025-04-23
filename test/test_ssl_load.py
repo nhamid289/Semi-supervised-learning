@@ -66,7 +66,7 @@ Net = get_net_builder(config.net, from_name=False)
 model = Net(num_classes=10)
 # model = Net(pretrained=config.use_pretrain, pretrained_path=config.pretrain_path, num_classes=10)
 
-checkpoint = torch.load("saved_models/fixmatch/cifar10-2025-04-15,20:46-nlbpc:8lbs:16-ur:2-ne:2048-lr:0.0005-mom:0.9-nest:True-wd:0.0005.pth")
+checkpoint = torch.load("saved_models/fixmatch/cifar10-2025-04-23,17:06-nlbpc:8lbs:16-ur:2-ne:2048-lr:0.0005-mom:0.9-nest:True-wd:0.0005.pth")
 model.load_state_dict(checkpoint)
 
 cifar10 = Cifar10()
@@ -86,8 +86,7 @@ def ssl_eval(model, eval_loader, device="cpu"):
     y_logits = []
 
     with torch.no_grad():
-        for data in eval_loader:
-            X, _, _, _, y = data
+        for X, _, _, _, y in eval_loader:
             X = X.to(device)
             y = y.to(device)
 

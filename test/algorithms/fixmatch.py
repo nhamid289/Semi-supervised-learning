@@ -1,7 +1,7 @@
 from semilearn.algorithms.fixmatch import SSLFixMatch
 from semilearn.algorithms import SSLAlgorithm
 from semilearn.datasets.cv_datasets import Cifar10
-from semilearn.utils.data import SSLDataLoader
+from semilearn.utils.data import SSLDataLoader, SSLCyclicLoader
 from datetime import datetime
 
 import torch
@@ -12,7 +12,7 @@ from tqdm import tqdm
 
 from semilearn import get_net_builder, get_config
 
-from train import ssl_train
+from train import ssl_train, ssl_train_cyclic
 
 config = {
     'algorithm': 'fixmatch',
@@ -80,10 +80,10 @@ data = Cifar10(num_lbl=labels_per_class)
 lbl_batch_size = 16
 uratio = 2
 
-train_loader = SSLDataLoader(data.get_lbl_dataset(), data.get_ulbl_dataset(), lbl_batch_size=lbl_batch_size, ulbl_batch_size=lbl_batch_size*uratio)
+train_loader = SSLCyclicLoader(data.get_lbl_dataset(), data.get_ulbl_dataset(), lbl_batch_size=lbl_batch_size, ulbl_batch_size=lbl_batch_size*uratio)
 
-nepochs=128
-ssl_train(model, algorithm, optimizer, train_loader, nepochs=nepochs, device="cuda" if torch.cuda.is_available() else "cpu")
+nepochs=2048
+ssl_train_cyclic(model, algorithm, optimizer, train_loader, num_iters=nepochs, device="cuda" if torch.cuda.is_available() else "cpu")
 
 now = datetime.now()
 
