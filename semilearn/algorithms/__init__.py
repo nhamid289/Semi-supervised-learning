@@ -19,5 +19,5 @@ def get_algorithm(args, net_builder, tb_log, logger):
 
 from .ssl_algorithm import SSLAlgorithm
 
-from .fullysupervised import SSLFullySupervised
+from .fullysupervised import SSLFullySupervised, SSLSupervised
 from .fixmatch import SSLFixMatch

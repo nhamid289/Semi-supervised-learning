@@ -3,3 +3,4 @@
 
 from .fullysupervised import FullySupervised
 from .ssl_fully_supervised import SSLFullySupervised
+from .ssl_supervised import SSLSupervised
