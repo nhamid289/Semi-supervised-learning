@@ -78,7 +78,7 @@ labels_per_class = 8
 data = Cifar10(num_lbl=labels_per_class)
 
 lbl_batch_size = 16
-uratio = 3
+uratio = 2
 
 train_loader = SSLDataLoader(data.get_lbl_dataset(), data.get_ulbl_dataset(), lbl_batch_size=lbl_batch_size, ulbl_batch_size=lbl_batch_size*uratio)
 

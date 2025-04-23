@@ -2,7 +2,7 @@ import torch
 import numpy as np
 from inspect import signature
 
-from semilearn.algorithms.utils import smooth_targets
+
 from semilearn.utils.data import SSLBatch
 
 
@@ -24,39 +24,3 @@ class SSLAlgorithm:
         # return log_dict
         raise NotImplementedError
 
-    def compute_prob(self, logits):
-        return torch.softmax(logits, dim=-1)
-
-    @torch.no_grad()
-    def gen_ulb_targets(self, logits, use_hard_label=True, T=1.0, softmax=True,
-                        label_smoothing=0.0):
-        """
-        generate pseudo-labels from logits/probs
-
-        Args:
-            algorithm: base algorithm
-            logits: logits (or probs, need to set softmax to False)
-            use_hard_label: flag of using hard labels instead of soft labels
-            T: temperature parameters
-            softmax: flag of using softmax on logits
-            label_smoothing: label_smoothing parameter
-        """
-
-        logits = logits.detach()
-        if use_hard_label:
-            # return hard label directly
-            pseudo_label = torch.argmax(logits, dim=-1)
-            if label_smoothing:
-                pseudo_label = smooth_targets(logits, pseudo_label,
-                                              label_smoothing)
-
-        # return soft label
-        elif softmax:
-            # pseudo_label = torch.softmax(logits / T, dim=-1)
-            pseudo_label = self.compute_prob(logits / T)
-
-        else:
-            # inputs logits converted to probabilities already
-            pseudo_label = logits
-
-        return pseudo_label

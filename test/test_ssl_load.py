@@ -66,7 +66,7 @@ Net = get_net_builder(config.net, from_name=False)
 model = Net(num_classes=10)
 # model = Net(pretrained=config.use_pretrain, pretrained_path=config.pretrain_path, num_classes=10)
 
-checkpoint = torch.load("saved_models/cifar10-2025-04-14,15:44-nlbpc:8lbs:16-ur:3-ne:2048-lr:0.0005-mom:0.9-nest:True-wd:0.0005.pth")
+checkpoint = torch.load("saved_models/fixmatch/cifar10-2025-04-15,20:46-nlbpc:8lbs:16-ur:2-ne:2048-lr:0.0005-mom:0.9-nest:True-wd:0.0005.pth")
 model.load_state_dict(checkpoint)
 
 cifar10 = Cifar10()
