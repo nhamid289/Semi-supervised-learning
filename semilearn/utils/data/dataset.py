@@ -70,11 +70,12 @@ class BaseDataset(Dataset):
 
         if isinstance(X, np.ndarray):
             X = Image.fromarray(X)
-            X_orig = transforms.ToTensor()(X)
 
-        X_w = self.weak_transform(X) if self.weak_transform is not None else None
-        X_m = self.medium_transform(X) if self.medium_transform is not None else None
-        X_s = self.strong_transform(X) if self.strong_transform is not None else None
+        X_orig = transforms.ToTensor()(X)
+
+        X_w = self.weak_transform(X) if self.weak_transform is not None else X_orig
+        X_m = self.medium_transform(X) if self.medium_transform is not None else X_orig
+        X_s = self.strong_transform(X) if self.strong_transform is not None else X_orig
 
 
         return X_orig, X_w, X_m, X_s, y

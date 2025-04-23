@@ -72,7 +72,7 @@ class SSLMinimumLoader(SSLDataLoader):
     def __len__(self):
         return min(len(self.lbl_loader), len(self.ulbl_loader))
 
-class SSLCylicLoader(SSLDataLoader):
+class SSLCyclicLoader(SSLDataLoader):
     """
     A dataloader that continuously provides labelled and unlabelled batches.
     If either the labelled or unlabelled data is exhausted, it is reshuffled
@@ -108,7 +108,7 @@ class SSLCylicLoader(SSLDataLoader):
         try:
             ulbl_batch = next(self.ulbl_iter)
         except StopIteration:
-            self.ulbl_iter = iter(self.loader)
+            self.ulbl_iter = iter(self.ulbl_loader)
             ulbl_batch = next(self.ulbl_iter)
 
         return SSLBatch(*lbl_batch, *ulbl_batch)
