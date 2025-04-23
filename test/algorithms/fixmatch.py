@@ -83,7 +83,7 @@ uratio = 2
 train_loader = SSLDataLoader(data.get_lbl_dataset(), data.get_ulbl_dataset(), lbl_batch_size=lbl_batch_size, ulbl_batch_size=lbl_batch_size*uratio)
 
 nepochs=128
-ssl_train(model, algorithm, optimizer, train_loader, nepochs=nepochs, device="cuda")
+ssl_train(model, algorithm, optimizer, train_loader, nepochs=nepochs, device="cuda" if torch.cuda.is_available() else "cpu")
 
 now = datetime.now()
 
