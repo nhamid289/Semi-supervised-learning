@@ -12,7 +12,7 @@ from tqdm import tqdm
 
 from semilearn import get_net_builder, get_config
 
-from train import ssl_train, ssl_train_cyclic
+from train import ssl_train
 
 config = {
     'algorithm': 'fixmatch',
@@ -82,8 +82,8 @@ uratio = 2
 
 train_loader = SSLCyclicLoader(data.get_lbl_dataset(), data.get_ulbl_dataset(), lbl_batch_size=lbl_batch_size, ulbl_batch_size=lbl_batch_size*uratio)
 
-nepochs=2048
-ssl_train_cyclic(model, algorithm, optimizer, train_loader, num_iters=nepochs, device="cuda" if torch.cuda.is_available() else "cpu")
+nepochs=128
+ssl_train(model, algorithm, optimizer, train_loader, num_iters=nepochs, device="cuda" if torch.cuda.is_available() else "cpu")
 
 now = datetime.now()
 
