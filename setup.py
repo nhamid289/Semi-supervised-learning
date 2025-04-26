@@ -25,21 +25,17 @@ with pathlib.Path('requirements.txt').open() as requirements_txt:
     ]
 
 setup(
-    name='semilearn',
-    version='0.3.2',
-    description='Unfied Semi-Supervised Learning Benchmark',
+    name='sslearn',
+    version='0.1.0',
+    description='A semi-supervised learning library',
     long_description=long_description,
     long_description_content_type='text/markdown',
-    url='https://github.com/microsoft/Semi-supervised-learning',
-    author='Yidong Wang*, Hao Chen*, Yue Fan*, Wang Sun, Ran Tao, Wenxin Hou, Renjie Wang, Heli Qi, Zhen Wu,' 
-           'Satoshi Nakamura, Wei Ye, Marios Savvides, Bhiksha Raj, Takahiro Shinozaki, Bernt Schiele, Jindong Wang, Xing Xie, Yue Zhang',
-    author_email='yidongwang37@gmail.com, haoc3@andrew.cmu.edu, yuefan@mpi-inf.mpg.de, jindwang@microsoft.com',
-
-    # Note that this is a string of words separated by whitespace, not a list.
-    keywords='pytorch semi-supervised-learning',
-    packages=find_packages(exclude=['preprocess', 'saved_models', 'data', 'config']),
+    url='https://github.com/nhamid289/sslearn',
+    author='Nazeef Hamid, Nan Ye, Jonathan Wilton',
+    author_email='nazeef.h.289@gmail.com, nan.ye@uq.edu.au, jonathan.wilton@uq.edu.au',
+    keywords='pytorch semi-supervised-learning weakly-supervised-learning',
+    packages=['sslearn'],
     include_package_data=True,
-    # install_requires=['torch >= 1.8', 'torchvision', 'torchaudio', 'transformers', 'timm', 'progress', 'ruamel.yaml', 'scikit-image', 'scikit-learn', 'tensorflow', ''],
     install_requires=install_requires,
     python_requires='>=3.9',
 )
